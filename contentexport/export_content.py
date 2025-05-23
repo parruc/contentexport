@@ -1,24 +1,18 @@
 # -*- coding: UTF-8 -*-
 from collective.exportimport.export_content import ExportContent
+from DateTime import DateTime
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 TYPES_TO_EXPORT = [
-    "Folder",
-    "Document",
     "Event",
-    "File",
-    "Image",
-    "Link",
-    "News Item",
-    "Topic",
-    "Collection",
+    "strilloevento",
 ]
 
 # Content for test-migrations
-PATHS_TO_EXPORT = []
+PATHS_TO_EXPORT = ["/CUE/it/lectures-e-seminari"]
 
 MARKER_INTERFACES_TO_EXPORT = []
 
@@ -32,6 +26,7 @@ MARKER_INTERFACES_KEY = "exportimport.marker_interfaces"
 class CustomExportContent(ExportContent):
 
     QUERY = {
+        'start': {'query': DateTime('2023-01-01'), 'range': 'max'}
     }
 
     DROP_PATHS = [
