@@ -1,0 +1,12 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+           xmlns:zcml="http://namespaces.zope.org/zcml"
+           xmlns:browser="http://namespaces.zope.org/browser">
+
+<adapter
+    for="zope.schema.interfaces.IField
+         plone.dexterity.interfaces.IDexterityContent
+         zope.interface.Interface"
+    factory=".adapters.FieldSerializer"
+    provides="plone.restapi.interfaces.IFieldSerializer" />
+</configure>
