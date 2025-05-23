@@ -28,9 +28,16 @@
       />
 
 <adapter
+    for="zope.schema.interfaces.IField
+         plone.dexterity.interfaces.IDexterityContent
+         unibo.cue.interfaces.browserlayer.IBrowserLayer"
+    factory=".adapters.FieldSerializer"
+    provides="plone.restapi.interfaces.IFieldSerializer" />
+
+<adapter
     for="plone.formwidget.geolocation.field.GeolocationField
          plone.dexterity.interfaces.IDexterityContent
-         zope.interface.Interface"
+         unibo.cue.interfaces.browserlayer.IBrowserLayer"
     factory=".adapters.GeolocationFieldSerializer"
     provides="plone.restapi.interfaces.IFieldSerializer" />
 
