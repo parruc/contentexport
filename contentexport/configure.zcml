@@ -15,7 +15,7 @@
       name="export_content"
       for="zope.interface.Interface"
       class=".export_content.CustomExportContent"
-      layer="contentexport.interfaces.IContentexportLayer"
+      layer="CollectionFieldSerializer"
       permission="cmf.ManagePortal"
       />
 
@@ -28,16 +28,16 @@
       />
 
 <adapter
-    for="zope.schema.interfaces.IField
+    for="zope.schema.interfaces.ICollection
          plone.dexterity.interfaces.IDexterityContent
-         unibo.cue.interfaces.browserlayer.IBrowserLayer"
+         CollectionFieldSerializer"
     factory=".adapters.FieldSerializer"
     provides="plone.restapi.interfaces.IFieldSerializer" />
 
 <adapter
     for="plone.formwidget.geolocation.field.GeolocationField
          plone.dexterity.interfaces.IDexterityContent
-         unibo.cue.interfaces.browserlayer.IBrowserLayer"
+         CollectionFieldSerializer"
     factory=".adapters.GeolocationFieldSerializer"
     provides="plone.restapi.interfaces.IFieldSerializer" />
 

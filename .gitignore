@@ -1,4 +1,5 @@
 # Compiled python modules.
+collective.exportimport
 *.pyc
 
 # Python egg metadata, regenerated from source files by setuptools.
