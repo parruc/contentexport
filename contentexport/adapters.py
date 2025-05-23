@@ -10,12 +10,10 @@ from plone.restapi.interfaces import IFieldSerializer
 from plone.restapi.serializer.dxfields import DefaultFieldSerializer
 
 
-@adapter(IField, IDexterityContent, Interface)
-@implementer(IFieldSerializer)
 class FieldSerializer(DefaultFieldSerializer):
 
     def get_value(self, default=None):
-        if self.field.__name__ in ["vedi_anche", "contacts"]:
+        if self.field.__name__ in ["vedi_anche", "contacts", "attachments"]:
             print("Field ignored:", self.field.__name__)
             return None
         return getattr(self.field.interface(self.context), self.field.__name__, default)
