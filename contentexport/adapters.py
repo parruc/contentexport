@@ -16,6 +16,7 @@ class FieldSerializer(DefaultFieldSerializer):
 
     def get_value(self, default=None):
         if self.field.__name__ in ["vedi_anche", "contacts"]:
+            print("Field ignored:", self.field.__name__)
             return None
         return getattr(self.field.interface(self.context), self.field.__name__, default)
 
