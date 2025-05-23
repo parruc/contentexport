@@ -28,9 +28,10 @@
       />
 
 <adapter
-    for="plone.app.contenttypes.interfaces.IEvent zope.interface.Interface"
-    factory=".adapters.CustomEventJSONSerializer"
-    provides="plone.restapi.interfaces.ISerializeToJson"
-/>
+    for="plone.formwidget.geolocation.field.GeolocationField
+         plone.dexterity.interfaces.IDexterityContent
+         zope.interface.Interface"
+    factory=".serializer.geolocation.GeolocationFieldSerializer"
+    provides="plone.restapi.interfaces.IFieldSerializer" />
 
 </configure>

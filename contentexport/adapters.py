@@ -1,25 +1,26 @@
 from zope.interface import implementer
 from zope.component import adapter
-from plone.restapi.interfaces import ISerializeToJson
-from plone.restapi.serializer.dx import SerializeToJson
-from plone.app.contenttypes.interfaces import IEvent
+from plone.restapi.interfaces import IFieldSerializer
+from plone.restapi.serializer.converters import json_compatible
+from plone.dexterity.interfaces import IDexterityContent
 from plone.formwidget.geolocation.geolocation import Geolocation
+from plone.formwidget.geolocation.field import GeolocationField
+from z3c.form.interfaces import IFieldWidget
+from z3c.form.interfaces import IField
+from zope.interface import Interface
 
-@implementer(ISerializeToJson)
-@adapter(IEvent, Interface)
-class CustomEventJSONSerializer(SerializeToJson):
-    def __call__(self, include_items=True, exclude_fields=None, include_fields=None):
-        data = super().__call__(
-            include_items=include_items,
-            exclude_fields=exclude_fields,
-            include_fields=include_fields,
-        )
+from plone.restapi.serializer.default import DefaultFieldSerializer
 
-        geo = getattr(self.context, "geolocation", None)
-        if isinstance(geo, Geolocation):
-            data["geolocation"] = {
-                "latitude": geo.latitude,
-                "longitude": geo.longitude,
+@implementer(IFieldSerializer)
+@adapter(GeolocationField, IDexterityContent, Interface)
+class GeolocationFieldSerializer(DefaultFieldSerializer):
+    def __call__(self):
+        value = self.get_value()
+
+        if isinstance(value, Geolocation):
+            return {
+                "latitude": value.latitude,
+                "longitude": value.longitude
             }
 
-        return data
+        return None  # or return json_compatible(value) if fallback is needed
