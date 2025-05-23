@@ -1,15 +1,12 @@
 from zope.interface import implementer
 from zope.component import adapter
 from plone.restapi.interfaces import IFieldSerializer
-from plone.restapi.serializer.converters import json_compatible
 from plone.dexterity.interfaces import IDexterityContent
 from plone.formwidget.geolocation.geolocation import Geolocation
 from plone.formwidget.geolocation.field import GeolocationField
-from z3c.form.interfaces import IFieldWidget
-from z3c.form.interfaces import IField
 from zope.interface import Interface
 
-from plone.restapi.serializer.default import DefaultFieldSerializer
+from plone.restapi.serializer.dxfields import DefaultFieldSerializer
 
 @implementer(IFieldSerializer)
 @adapter(GeolocationField, IDexterityContent, Interface)
