@@ -12,7 +12,7 @@
       />
 
   <browser:page
-      name="export_content"
+      name="export_events"
       for="zope.interface.Interface"
       class=".export_content.CustomExportContent"
       layer="contentexport.interfaces.IContentexportLayer"
