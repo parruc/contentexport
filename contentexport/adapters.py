@@ -7,7 +7,7 @@ from zope.interface import Interface
 from plone.restapi.interfaces import IFieldSerializer
 
 from plone.restapi.serializer.dxfields import DefaultFieldSerializer
-from plone.exportimport.serializer import CollectionFieldSerializer
+from collective.exportimport.serializer import CollectionFieldSerializer
 
 
 @implementer(IFieldSerializer)
