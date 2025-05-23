@@ -29,7 +29,7 @@
 
 <adapter
     for="plone.app.contenttypes.interfaces.IEvent zope.interface.Interface"
-    factory=".serializer.event.CustomEventJSONSerializer"
+    factory=".adapters.CustomEventJSONSerializer"
     provides="plone.restapi.interfaces.ISerializeToJson"
 />
 
