@@ -8,7 +8,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-TYPES_TO_EXPORT = []
+TYPES_TO_EXPORT = [
+    "Event",
+    "strilloevento",
+]
 
 
 class ExportAll(BrowserView):
@@ -17,11 +20,6 @@ class ExportAll(BrowserView):
         request = self.request
         if not request.form.get("form.submitted", False):
             return self.index()
-
-        qi = api.portal.get_tool("portal_quickinstaller")
-        if not qi.isProductInstalled("contentimport"):
-            qi.installProducts(["contentimport"])
-            alsoProvides(request, IContentexportLayer)
 
         portal = api.portal.get()
 
@@ -38,17 +36,7 @@ class ExportAll(BrowserView):
         )
         logger.info("Finished {}".format(export_name))
 
-        other_exports = [
-            "export_relations",
-            "export_members",
-            "export_translations",
-            "export_localroles",
-            "export_ordering",
-            "export_defaultpages",
-            "export_discussion",
-            "export_portlets",
-            "export_redirects",
-        ]
+        other_exports = []
         for export_name in other_exports:
             export_view = api.content.get_view(export_name, portal, request)
             request.form["form.submitted"] = True
