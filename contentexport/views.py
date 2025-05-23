@@ -2,7 +2,6 @@
 from contentexport.interfaces import IContentexportLayer
 from plone import api
 from Products.Five import BrowserView
-from zope.interface import alsoProvides
 
 import logging
 

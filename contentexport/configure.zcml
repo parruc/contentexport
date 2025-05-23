@@ -27,4 +27,10 @@
       permission="cmf.ManagePortal"
       />
 
+<adapter
+    for="plone.app.contenttypes.interfaces.IEvent zope.interface.Interface"
+    factory=".serializer.event.CustomEventJSONSerializer"
+    provides="plone.restapi.interfaces.ISerializeToJson"
+/>
+
 </configure>

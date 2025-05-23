@@ -7,10 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-TYPES_TO_EXPORT = [
-    "Event",
-    "strilloevento",
-]
+TYPES_TO_EXPORT = []
 
 # Content for test-migrations
 PATHS_TO_EXPORT = ["/CUE/it/lectures-e-seminari"]
@@ -48,6 +45,17 @@ class CustomExportContent(ExportContent):
     def update(self):
         self.portal_type = self.portal_type or TYPES_TO_EXPORT
 
+    def serialize_field_value(self, obj, fieldname, value):
+        # Converti Geolocation in dizionario JSON-compatibile
+        if isinstance(value, Geolocation):
+            return {
+                'latitude': value.latitude,
+                'longitude': value.longitude
+            }
+
+        # Tutto il resto usa il metodo originale
+        return super(CustomExportContent, self).serialize_field_value(obj, fieldname, value)
+
     def global_obj_hook(self, obj):
         """Used this to inspect the content item before serialisation data.
         Bad: Changing the content-item is a bad idea.
@@ -62,7 +70,7 @@ class CustomExportContent(ExportContent):
         for key, value in item.get('fields', {}).items():
             if key in IGNORED_FIELDS:
                 del item['fields'][key]
-            if isinstance(value, Geolocation):
+            if key == "geolocation":
                 item['fields'][key] = {
                     'latitude': value.latitude,
                     'longitude': value.longitude,
