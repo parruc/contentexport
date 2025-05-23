@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from collective.exportimport.export_content import ExportContent
+from plone.formwidget.geolocation.geolocation import Geolocation
 from DateTime import DateTime
 
 import logging
@@ -52,4 +53,11 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data.
         Return None if you want to skip this particular object.
         """
+        for key, value in item.get('fields', {}).items():
+            if isinstance(value, Geolocation):
+                item['fields'][key] = {
+                    'latitude': value.latitude,
+                    'longitude': value.longitude,
+                }
+        return item
         return item

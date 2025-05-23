@@ -27,10 +27,4 @@
       permission="cmf.ManagePortal"
       />
 
-<utility
-    component="contentexport.adapters.GeolocationConverter"
-    provides="collective.exportimport.interfaces.IFieldConverter"
-    factory="contentexport.adapters.GeolocationConverter"
-/>
-
 </configure>
