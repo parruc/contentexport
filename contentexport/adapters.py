@@ -5,6 +5,7 @@ from plone.formwidget.geolocation.geolocation import Geolocation
 from plone.formwidget.geolocation.field import GeolocationField
 from zope.interface import Interface
 from plone.restapi.interfaces import IFieldSerializer
+from z3c.relationfield.interfaces import IRelation
 
 from plone.restapi.serializer.dxfields import DefaultFieldSerializer
 from collective.exportimport.serializer import CollectionFieldSerializer
@@ -35,3 +36,15 @@ class GeolocationFieldSerializer(DefaultFieldSerializer):
         return None  # or return json_compatible(value) if fallback is needed
 
 
+
+@implementer(IFieldSerializer)
+@adapter(IRelation, IDexterityContent, Interface)
+class LeadImageSerializer(DefaultFieldSerializer):
+    def __call__(self):
+        value = self.get_value()
+
+    
+    def get_value(self, default=None):
+        if self.field.__name__ in ["leadimage"]:
+            print("TODO: add blob")
+            return None

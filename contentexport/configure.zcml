@@ -41,4 +41,11 @@
     factory=".adapters.GeolocationFieldSerializer"
     provides="plone.restapi.interfaces.IFieldSerializer" />
 
+<adapter
+    for="z3c.relationfield.interfaces.IRelation
+         plone.dexterity.interfaces.IDexterityContent
+         contentexport.interfaces.IContentexportLayer"
+    factory=".adapters.LeadImageSerializer"
+    provides="plone.restapi.interfaces.IFieldSerializer" />
+
 </configure>

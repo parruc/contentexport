@@ -23,7 +23,6 @@ MARKER_INTERFACES_KEY = "exportimport.marker_interfaces"
 class CustomExportContent(ExportContent):
 
     QUERY = {
-        'start': {'query': DateTime('2023-01-01'), 'range': 'max'}
     }
 
     DROP_PATHS = [
@@ -49,4 +48,6 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data.
         Return None if you want to skip this particular object.
         """
+        if item["start"] > "2023":
+            return None
         return item
