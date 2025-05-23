@@ -31,7 +31,7 @@
     for="plone.formwidget.geolocation.field.GeolocationField
          plone.dexterity.interfaces.IDexterityContent
          zope.interface.Interface"
-    factory=".serializer.geolocation.GeolocationFieldSerializer"
+    factory=".adapters.GeolocationFieldSerializer"
     provides="plone.restapi.interfaces.IFieldSerializer" />
 
 </configure>
