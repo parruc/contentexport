@@ -19,6 +19,12 @@ MARKER_INTERFACES_TO_EXPORT = []
 
 ANNOTATIONS_TO_EXPORT = []
 
+IGNORED_FIELDS = [
+    'vedi_anche',
+    'contacts',
+    # aggiungi tutti i campi del behavior IVediache
+]
+
 ANNOTATIONS_KEY = "exportimport.annotations"
 
 MARKER_INTERFACES_KEY = "exportimport.marker_interfaces"
@@ -54,10 +60,11 @@ class CustomExportContent(ExportContent):
         Return None if you want to skip this particular object.
         """
         for key, value in item.get('fields', {}).items():
+            if key in IGNORED_FIELDS:
+                del item['fields'][key]
             if isinstance(value, Geolocation):
                 item['fields'][key] = {
                     'latitude': value.latitude,
                     'longitude': value.longitude,
                 }
-        return item
         return item
