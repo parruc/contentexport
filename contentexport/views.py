@@ -29,7 +29,7 @@ class ExportAll(BrowserView):
         request.form["form.submitted"] = True
         view(
             portal_type=exported_types,
-            include_blobs=2,
+            include_blobs=1,
             download_to_server=True,
             migration=True,
         )
