@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
 from collective.exportimport.export_content import ExportContent
-from DateTime import DateTime
+from z3c.relationfield.interfaces import IRelationChoice
+from z3c.relationfield.interfaces import IRelationList
+from zope.schema import getFields
+from plone.dexterity.utils import iterSchemata
 
 import logging
 
@@ -51,3 +54,13 @@ class CustomExportContent(ExportContent):
         if item["start"] > "2023":
             return None
         return item
+
+    def update_data_for_migration(self, item, obj):
+        for schema in iterSchemata(obj):
+            for name, field in getFields(schema).items():
+                if IRelationChoice.providedBy(field) or IRelationList.providedBy(
+                    field
+                ):
+                    if name == "leadimage":
+                        import pdb; pdb.set_trace()  # fmt: skip
+                        item["leadimage"] = field.value
