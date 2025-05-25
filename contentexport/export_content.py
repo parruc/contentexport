@@ -57,13 +57,20 @@ class CustomExportContent(ExportContent):
         return item
 
     def update_data_for_migration(self, item, obj):
+        LEADIMAGE = None
         for schema in iterSchemata(obj):
             for name, field in getFields(schema).items():
                 if IRelationChoice.providedBy(field) or IRelationList.providedBy(
                     field
                 ):
                     if name == "leadimage" and obj.leadimage:
-                        leadimage = obj.leadimage.to_object
-                        if leadimage:
-                            item["leadimage"] = b64encode(leadimage.image.data).decode("utf-8")
-        return super(CustomExportContent, self).update_data_for_migration(item, obj)
+                        LEADIMAGE = obj.leadimage.to_object
+        item =  super(CustomExportContent, self).update_data_for_migration(item, obj)
+        if LEADIMAGE:
+            item["leadimage"] = {
+                "filename": LEADIMAGE.image.filename,
+                "content-type" : LEADIMAGE.image.contentType,
+                "encoding": "base64",
+                "data": b64encode(LEADIMAGE.image.data).decode("utf-8")
+            }
+        return item
