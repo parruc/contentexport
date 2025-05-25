@@ -62,7 +62,7 @@ class CustomExportContent(ExportContent):
                 if IRelationChoice.providedBy(field) or IRelationList.providedBy(
                     field
                 ):
-                    if name == "leadimage":
+                    if name == "leadimage" and obj.leadimage:
                         leadimage = obj.leadimage.to_object
                         if leadimage:
                             item["leadimage"] = b64encode(leadimage.image.data).decode("utf-8")
