@@ -4,6 +4,7 @@ from z3c.relationfield.interfaces import IRelationChoice
 from z3c.relationfield.interfaces import IRelationList
 from zope.schema import getFields
 from plone.dexterity.utils import iterSchemata
+from base64 import b64encode
 
 import logging
 
@@ -62,5 +63,7 @@ class CustomExportContent(ExportContent):
                     field
                 ):
                     if name == "leadimage":
-                        import pdb; pdb.set_trace()  # fmt: skip
-                        item["leadimage"] = field.value
+                        leadimage = obj.leadimage.to_object
+                        if leadimage:
+                            item["leadimage"] = b64encode(leadimage.image.data).decode("utf-8")
+        return super(CustomExportContent, self).update_data_for_migration(item, obj)

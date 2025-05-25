@@ -34,17 +34,3 @@ class GeolocationFieldSerializer(DefaultFieldSerializer):
             }
 
         return None  # or return json_compatible(value) if fallback is needed
-
-
-
-@implementer(IFieldSerializer)
-@adapter(IRelation, IDexterityContent, Interface)
-class LeadImageSerializer(DefaultFieldSerializer):
-    def __call__(self):
-        value = self.get_value()
-
-    
-    def get_value(self, default=None):
-        if self.field.__name__ in ["leadimage"]:
-            print("TODO: add blob")
-            return None
