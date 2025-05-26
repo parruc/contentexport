@@ -58,6 +58,8 @@ class CustomExportContent(ExportContent):
 
     def update_data_for_migration(self, item, obj):
         LEADIMAGE = None
+        RESOURCE = None
+
         for schema in iterSchemata(obj):
             for name, field in getFields(schema).items():
                 if IRelationChoice.providedBy(field) or IRelationList.providedBy(
@@ -65,12 +67,16 @@ class CustomExportContent(ExportContent):
                 ):
                     if name == "leadimage" and obj.leadimage:
                         LEADIMAGE = obj.leadimage.to_object
+                    if name == "resource" and obj.resource:
+                        RESOURCE = obj.resource.to_object
         item =  super(CustomExportContent, self).update_data_for_migration(item, obj)
         if LEADIMAGE:
-            item["leadimage"] = {
+            item["image"] = {
                 "filename": LEADIMAGE.image.filename,
                 "content-type" : LEADIMAGE.image.contentType,
                 "encoding": "base64",
                 "data": b64encode(LEADIMAGE.image.data).decode("utf-8")
             }
+        if RESOURCE and RESOURCE.remoteUrl:
+            item["remoteUrl"] = RESOURCE.remoteUrl
         return item
