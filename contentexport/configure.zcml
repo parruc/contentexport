@@ -27,4 +27,11 @@
       permission="cmf.ManagePortal"
       />
 
+    <adapter
+    for="zope.schema.interfaces.ICollection
+         plone.dexterity.interfaces.IDexterityContent
+         contentexport.interfaces.IContentexportLayer"
+    factory=".adapters.CollectionFieldSerializer"
+    provides="plone.restapi.interfaces.IFieldSerializer" />
+
 </configure>
