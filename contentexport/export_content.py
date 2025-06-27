@@ -54,8 +54,10 @@ class CustomExportContent(ExportContent):
             "title": subobj.title,
             "id": subobj.id,
             "description": subobj.description,
+            "old_type": subobj.portal_type,
             "image": encoded_data.decode('utf-8'),
-            "old_type": subobj.portal_type
+            "filename": subobj.image.filename,
+            "content_type": subobj.image.contentType,
         }
 
     def extract_link(self, subobj):
@@ -75,7 +77,9 @@ class CustomExportContent(ExportContent):
                 "description": subobj.description,
                 "id": subobj.id,
                 "old_type": subobj.portal_type,
-                "file": encoded_data.decode('utf-8')
+                "file": encoded_data.decode('utf-8'),
+                "filename": subobj.file.filename,
+                "content_type": subobj.file.contentType,
         }
 
     def extract_tiles(self, obj):
@@ -103,7 +107,7 @@ class CustomExportContent(ExportContent):
         item["alt"] = item.pop("titolo_immagine")
         item["image"] = item.pop("immagine", None)
         item["brief"] = item.pop("testo", None)
-        item.pop("canale", None)
+        item.pop("canale", None) # DA CAPIRE COME MAPPARLI
         item.pop("rubrica", None)
         item.pop("event", None)
         item.pop("escludi_dal_portale", None)
