@@ -55,9 +55,10 @@ class CustomExportContent(ExportContent):
             "id": subobj.id,
             "description": subobj.description,
             "old_type": subobj.portal_type,
-            "image": encoded_data.decode('utf-8'),
+            "data": encoded_data.decode('utf-8'),
             "filename": subobj.image.filename,
-            "content_type": subobj.image.contentType,
+            "content-type": subobj.image.contentType,
+            "encoding": "base64",
         }
 
     def extract_link(self, subobj):
@@ -77,9 +78,10 @@ class CustomExportContent(ExportContent):
                 "description": subobj.description,
                 "id": subobj.id,
                 "old_type": subobj.portal_type,
-                "file": encoded_data.decode('utf-8'),
+                "data": encoded_data.decode('utf-8'),
                 "filename": subobj.file.filename,
-                "content_type": subobj.file.contentType,
+                "content-type": subobj.file.contentType,
+                "encoding": "base64",
         }
 
     def extract_tiles(self, obj):
