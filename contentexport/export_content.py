@@ -44,6 +44,9 @@ class CustomExportContent(ExportContent):
         Return None if you want to skip this particular object.
         """
         item["tiles"] = self.extract_tiles(obj)
+        testo = item.pop("testo", None)
+        if testo:
+            item["tiles"].append({"old_type": "richtext", "text": testo})
         item["is_folderish"] = False
         return item
 
@@ -108,7 +111,6 @@ class CustomExportContent(ExportContent):
         item["@type"] = "Articolo"
         item["alt"] = item.pop("titolo_immagine")
         item["image"] = item.pop("immagine", None)
-        item["brief"] = item.pop("testo", None)
         item.pop("canale", None) # DA CAPIRE COME MAPPARLI
         item.pop("rubrica", None)
         item.pop("event", None)
