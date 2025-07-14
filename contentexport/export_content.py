@@ -111,6 +111,8 @@ class CustomExportContent(ExportContent):
         item["@type"] = "Articolo"
         item["alt"] = item.pop("titolo_immagine")
         item["image"] = item.pop("immagine", None)
+        if item["effective"] < "2014-05-01T00:00:01":
+            item["mostra_immagine"] = False
         item.pop("canale", None) # DA CAPIRE COME MAPPARLI
         item.pop("rubrica", None)
         item.pop("event", None)
@@ -122,6 +124,7 @@ class CustomExportContent(ExportContent):
         Return None if you want to skip this particular object.
         """
         item["@type"] = "Articolo"
+        item["mostra_immagine"] = False
         item["image"] = item.pop("immagine", None)
         item["brief"] = item.pop("testo", None)
         item["alt"] = item.pop("titolo_immagine")
