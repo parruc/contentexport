@@ -6,8 +6,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+COUNTER = 0
+
 # Content for test-migrations
-PATHS_TO_EXPORT = ["/magazine/archivio", "/magazine/comunicati-stampa"]
+PATHS_TO_EXPORT = ["/magazine/archivio/2015", "/magazine/comunicati-stampa"]
 
 MARKER_INTERFACES_TO_EXPORT = []
 
@@ -43,6 +45,10 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data.
         Return None if you want to skip this particular object.
         """
+        # global COUNTER
+        # COUNTER += 1
+        # if COUNTER > 100:
+        #     return
         item["tiles"] = self.extract_tiles(obj)
         testo = item.pop("testo", None)
         if testo:
@@ -108,12 +114,14 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data for articles.
         Return None if you want to skip this particular object.
         """
+        if item["rubrica"] == "9":
+            return
         item["@type"] = "Articolo"
+        item["description"] = item.get("description", ""). replace("\r\n", " ").replace("\n", " ")
         item["alt"] = item.pop("titolo_immagine")
         item["image"] = item.pop("immagine", None)
         if item["effective"] < "2014-05-01T00:00:01":
             item["mostra_immagine"] = False
-        item.pop("canale", None) # DA CAPIRE COME MAPPARLI
         item.pop("rubrica", None)
         item.pop("event", None)
         item.pop("escludi_dal_portale", None)
@@ -123,6 +131,7 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data for fotoracconti.
         Return None if you want to skip this particular object.
         """
+        item["old_type"] = "Fotoracconto"
         item["@type"] = "Articolo"
         item["mostra_immagine"] = False
         item["image"] = item.pop("immagine", None)
