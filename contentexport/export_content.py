@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 import base64
 from collective.exportimport.export_content import ExportContent
-
+from bs4 import BeautifulSoup
 import logging
+from plone import api
 
 logger = logging.getLogger(__name__)
 
@@ -49,9 +50,10 @@ class CustomExportContent(ExportContent):
         # COUNTER += 1
         # if COUNTER > 100:
         #     return
-        item["tiles"] = self.extract_tiles(obj)
         testo = item.pop("testo", None)
+        item["tiles"] = self.extract_tiles(obj)
         if testo:
+            testo = self.remove_images_from_html(testo)
             item["tiles"].append({"old_type": "richtext", "text": testo})
         item["is_folderish"] = False
         return item
@@ -93,6 +95,17 @@ class CustomExportContent(ExportContent):
                 "encoding": "base64",
         }
 
+    def remove_images_from_html(self, testo):
+        text_data = testo.get("data", "")
+        soup = BeautifulSoup(text_data, "html.parser")
+        for img in soup.find_all("img"):
+            src = img.get("src", "")
+            if src.startswith("resolveuid/"):
+                img.decompose()
+        testo["data"] = str(soup)
+        return testo
+        
+
     def extract_tiles(self, obj):
         tiles = []
         for subbrain in obj.getFolderContents():
@@ -133,6 +146,7 @@ class CustomExportContent(ExportContent):
         """
         item["old_type"] = "Fotoracconto"
         item["@type"] = "Articolo"
+        item["description"] = item.get("description", ""). replace("\r\n", " ").replace("\n", " ")
         item["mostra_immagine"] = False
         item["image"] = item.pop("immagine", None)
         item["brief"] = item.pop("testo", None)
