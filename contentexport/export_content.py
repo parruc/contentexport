@@ -35,6 +35,12 @@ class CustomExportContent(ExportContent):
     def update_query(self, query):
         return query
 
+    def export_content(self):
+        for item in super(CustomExportContent, self).export_content():
+            if not item:
+                continue
+            yield item
+
     def global_obj_hook(self, obj):
         """Used this to inspect the content item before serialisation data.
         Bad: Changing the content-item is a bad idea.
@@ -50,6 +56,16 @@ class CustomExportContent(ExportContent):
         # COUNTER += 1
         # if COUNTER > 100:
         #     return
+        if "/magazine/bozze/" in item["@id"]:
+            return None
+        if item.get("rubrica", "") == "9":
+            return None
+        dipartimenti = item.get("dipartimenti")
+        if dipartimenti and "darvipem" in dipartimenti:
+            item["dipartimenti"].remove("darvipem")
+            item["dipartimenti"].append("dar")
+        if not item.get("language", ""):
+            item["language"] = "Italiano"
         testo = item.pop("testo", None)
         item["tiles"] = self.extract_tiles(obj)
         if testo:
@@ -127,8 +143,6 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data for articles.
         Return None if you want to skip this particular object.
         """
-        if item["rubrica"] == "9":
-            return
         item["@type"] = "Articolo"
         item["description"] = item.get("description", ""). replace("\r\n", " ").replace("\n", " ")
         item["alt"] = item.pop("titolo_immagine")
