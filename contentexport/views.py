@@ -8,11 +8,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# List of portal types to export, empty list means all types
 TYPES_TO_EXPORT = []
 
 
 class ExportAll(BrowserView):
-
     def __call__(self):
         request = self.request
         if not request.form.get("form.submitted", False):
@@ -28,12 +28,13 @@ class ExportAll(BrowserView):
         export_name = "export_content"
         logger.info("Start {}".format(export_name))
         view = api.content.get_view(export_name, portal, request)
-        exported_types = TYPES_TO_EXPORT
         request.form["form.submitted"] = True
         view(
-            portal_type=exported_types,
+            portal_type=TYPES_TO_EXPORT,
+            # 0=As download urls, 1=As base-64 encoded strings, 2=As blob paths
             include_blobs=2,
-            download_to_server=True,
+            # 0=Download to local machine, 1=Download to server, 2=Save each item as a separate file on the server
+            download_to_server=1,
             migration=True,
         )
         logger.info("Finished {}".format(export_name))
