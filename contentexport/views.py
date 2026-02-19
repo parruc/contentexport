@@ -32,7 +32,7 @@ class ExportAll(BrowserView):
         view(
             portal_type=TYPES_TO_EXPORT,
             # 0=As download urls, 1=As base-64 encoded strings, 2=As blob paths
-            include_blobs=2,
+            include_blobs=1,
             # 0=Download to local machine, 1=Download to server, 2=Save each item as a separate file on the server
             download_to_server=1,
             migration=True,
