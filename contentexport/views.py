@@ -37,6 +37,7 @@ class ExportAll(BrowserView):
             download_to_server=1,
             migration=True,
         )
+        logger.info("Main export written to var/instance/<portal-id>.json")
         logger.info("Finished {}".format(export_name))
 
         other_exports = [

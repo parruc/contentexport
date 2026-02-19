@@ -15,6 +15,9 @@ TYPES_TO_EXPORT = [
     "News Item",
     "Topic",
     "Collection",
+    "Biography",
+    "Biography_container",
+    "HomePage",
 ]
 
 # Content for test-migrations
