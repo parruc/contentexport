@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from contentexport.interfaces import IContentexportLayer
 from plone import api
+from Products.CMFPlone.utils import get_installer
 from Products.Five import BrowserView
 from zope.interface import alsoProvides
 
@@ -18,10 +19,10 @@ class ExportAll(BrowserView):
         if not request.form.get("form.submitted", False):
             return self.index()
 
-        qi = api.portal.get_tool("portal_quickinstaller")
-        if not qi.isProductInstalled("contentimport"):
-            qi.installProducts(["contentimport"])
-            alsoProvides(request, IContentexportLayer)
+        installer = get_installer(api.portal.get())
+        if not installer.is_product_installed("contentexport"):
+            installer.install_product("contentexport")
+        alsoProvides(request, IContentexportLayer)
 
         portal = api.portal.get()
 
@@ -32,7 +33,7 @@ class ExportAll(BrowserView):
         view(
             portal_type=TYPES_TO_EXPORT,
             # 0=As download urls, 1=As base-64 encoded strings, 2=As blob paths
-            include_blobs=2,
+            include_blobs=1,
             # 0=Download to local machine, 1=Download to server, 2=Save each item as a separate file on the server
             download_to_server=1,
             migration=True,
