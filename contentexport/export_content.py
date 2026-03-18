@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from collective.exportimport.export_content import ExportContent
+from unibo.api.content import last_modifier
 
 import logging
 
@@ -21,6 +22,7 @@ TYPES_TO_EXPORT = [
     "Channel",
     "Newsletter",
     "CorsiStudio",
+    "Events",
     "AgendaEventi",
     "AgendaEvento",
     "AltaFormazione",
@@ -86,4 +88,7 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data.
         Return None if you want to skip this particular object.
         """
+        modifier_id = last_modifier(obj)
+        if modifier_id:
+            item["last_modifier"] = modifier_id
         return item
