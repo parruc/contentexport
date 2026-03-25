@@ -47,8 +47,6 @@ class ExportAll(BrowserView):
             "export_localroles",
             "export_ordering",
             "export_defaultpages",
-            "export_discussion",
-            "export_portlets",
             "export_redirects",
         ]
         for export_name in other_exports:
