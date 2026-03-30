@@ -7,51 +7,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-TYPES_TO_EXPORT = [
-    "Folder",
-    "Document",
-    "Event",
-    "File",
-    "Image",
-    "Link",
-    "News Item",
-    "Topic",
-    "Collection",
-    # Custom dipartimenti types
-    "HomePage",
-    "Banner",
-    "Channel",
-    "Newsletter",
-    "CorsiStudio",
-    "Events",
-    "AgendaEventi",
-    "AgendaEvento",
-    "AltaFormazione",
-    "Ambito",
-    "Collane",
-    "Contacts",
-    "Dottorati",
-    "EasyForm",
-    "GuidaOnline",
-    "LanguageFolder",
-    "Masters",
-    "MediaGallery",
-    "NewsRoom",
-    "OverviewInternazionale",
-    "Personale",
-    "Pubblicazioni",
-    "Ricerca",
-    "ScuoleSpecializzazione",
-    "SiteContainer",
-    "SommarioAmbiti",
-    "StrilloEvento",
-    "StrilloNotizia",
-    "Visiting",
-]
-
-# Content for test-migrations
-PATHS_TO_EXPORT = []
-
 MARKER_INTERFACES_TO_EXPORT = []
 
 ANNOTATIONS_TO_EXPORT = []
@@ -76,12 +31,6 @@ class CustomExportContent(ExportContent):
 
     def update_query(self, query):
         return query
-
-    def update(self):
-        if TYPES_TO_EXPORT:
-            self.portal_type = TYPES_TO_EXPORT
-        if PATHS_TO_EXPORT:
-            self.path = PATHS_TO_EXPORT
 
     def global_obj_hook(self, obj):
         """Used this to inspect the content item before serialisation data.
