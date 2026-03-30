@@ -78,7 +78,10 @@ class CustomExportContent(ExportContent):
         return query
 
     def update(self):
-        self.portal_type = self.portal_type or TYPES_TO_EXPORT
+        if TYPES_TO_EXPORT:
+            self.portal_type = TYPES_TO_EXPORT
+        if PATHS_TO_EXPORT:
+            self.path = PATHS_TO_EXPORT
 
     def global_obj_hook(self, obj):
         """Used this to inspect the content item before serialisation data.
