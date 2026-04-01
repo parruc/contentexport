@@ -52,7 +52,7 @@ TYPES_TO_EXPORT = [
     "Visiting",
 ]
 
-PATHS_TO_EXPORT = ["/dipartimenti/bigea", "/dipartimenti/resources"]
+PATHS_TO_EXPORT = ["/dipartimenti"]
 
 
 class ExportAll(BrowserView):
