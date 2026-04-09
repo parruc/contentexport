@@ -64,6 +64,28 @@ class CustomExportContent(ExportContent):
         """Used this to modify the serialized data.
         Return None if you want to skip this particular object.
         """
+        SITE_ROOT = "http://cms01:4081/dipartimenti/"
+        RESOURCES = f"{SITE_ROOT}resources/"
+        if item.get("@id") == RESOURCES:
+            return None  # Skip this item entirely
+        
+        if item.get("@id") in (f"{RESOURCES}it", f"{RESOURCES}en"):
+            item["@type"] = "LanguageFolder"
+
+        if item.get("@id").startswith(f"{RESOURCES}it"):
+            item["language"] = "it"
+            item["@id"] = item["@id"].replace(f"{RESOURCES}it", f"{SITE_ROOT}it")
+            if item["parent"]["@id"] == f"{RESOURCES}it":
+                item["parent"]["@type"] = "LanguageFolder"
+            item["parent"]["@id"] = item["parent"]["@id"].replace(f"{RESOURCES}it", f"{SITE_ROOT}it")
+        
+        if item.get("@id").startswith(f"{RESOURCES}en"):
+            item["language"] = "en"
+            item["@id"] = item["@id"].replace(f"{RESOURCES}en", f"{SITE_ROOT}en")
+            if item["parent"]["@id"] == f"{RESOURCES}en":
+                item["parent"]["@type"] = "LanguageFolder"
+            item["parent"]["@id"] = item["parent"]["@id"].replace(f"{RESOURCES}en", f"{SITE_ROOT}en")
+
         modifier_id = last_modifier(obj)
         if modifier_id:
             item["last_modifier"] = modifier_id
@@ -115,6 +137,8 @@ class CustomExportContent(ExportContent):
                     except (ValueError, AttributeError):
                         continue
 
+                    if tile_type == "unibo.tiles.rss_eventi":
+                        continue
                     annotation_key = "{}.{}".format(ANNOTATIONS_KEY_PREFIX, tile_id)
                     annotation = annotations.get(annotation_key)
                     if annotation is None:
