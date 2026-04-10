@@ -32,6 +32,8 @@ SUPPORTED_LANGUAGES = ("it", "en")
 
 TILES_KEY = "exportimport.tiles_data"
 
+TILES_TO_REMOVE = ["unibo.tiles.rss_eventi", "unibo.tiles.bandi"]
+
 
 class CustomExportContent(ExportContent):
 
@@ -44,6 +46,8 @@ class CustomExportContent(ExportContent):
     DROP_UIDS = [
     ]
 
+    SITE_ROOT = "http://cms01:4081/dipartimenti"
+
     def update_query(self, query):
         return query
 
@@ -53,38 +57,36 @@ class CustomExportContent(ExportContent):
             item[MARKER_INTERFACES_KEY] = interfaces
         return item
 
+
     def global_obj_hook(self, obj):
         """Used this to inspect the content item before serialisation data.
         Bad: Changing the content-item is a bad idea.
         Good: Return None if you want to skip this particular object.
         """
+        RESOURCES = f"{self.SITE_ROOT}/resources"
+        if obj.absolute_url() == RESOURCES:
+            return None
         return obj
 
     def global_dict_hook(self, item, obj):
         """Used this to modify the serialized data.
         Return None if you want to skip this particular object.
         """
-        SITE_ROOT = "http://cms01:4081/dipartimenti/"
-        RESOURCES = f"{SITE_ROOT}resources/"
-        if item.get("@id") == RESOURCES:
-            return None  # Skip this item entirely
-        
-        if item.get("@id") in (f"{RESOURCES}it", f"{RESOURCES}en"):
-            item["@type"] = "LanguageFolder"
+        RESOURCES = f"{self.SITE_ROOT}/resources"
 
-        if item.get("@id").startswith(f"{RESOURCES}it"):
-            item["language"] = "it"
-            item["@id"] = item["@id"].replace(f"{RESOURCES}it", f"{SITE_ROOT}it")
-            if item["parent"]["@id"] == f"{RESOURCES}it":
-                item["parent"]["@type"] = "LanguageFolder"
-            item["parent"]["@id"] = item["parent"]["@id"].replace(f"{RESOURCES}it", f"{SITE_ROOT}it")
-        
-        if item.get("@id").startswith(f"{RESOURCES}en"):
-            item["language"] = "en"
-            item["@id"] = item["@id"].replace(f"{RESOURCES}en", f"{SITE_ROOT}en")
-            if item["parent"]["@id"] == f"{RESOURCES}en":
-                item["parent"]["@type"] = "LanguageFolder"
-            item["parent"]["@id"] = item["parent"]["@id"].replace(f"{RESOURCES}en", f"{SITE_ROOT}en")
+        if item.get("@id").startswith(RESOURCES):
+            for lang in SUPPORTED_LANGUAGES:
+                if item.get("@id").startswith(f"{RESOURCES}/{lang}"):
+                    item["language"] = lang
+                    if item.get("@id") == f"{RESOURCES}/{lang}":
+                        item["@type"] = "LanguageFolder"
+                        item["parent"]["@id"] = self.SITE_ROOT
+                        item["parent"]["@type"] = "Plone Site"
+                        item["parent"]["UID"] = None
+                    else:
+                        if item.get("@id") == f"{RESOURCES}/{lang}/banners":
+                            item["parent"]["@type"] = "LanguageFolder"
+                    item["parent"]["@id"] = item["parent"]["@id"].replace(f"{RESOURCES}/{lang}", f"{self.SITE_ROOT}/{lang}")
 
         modifier_id = last_modifier(obj)
         if modifier_id:
@@ -134,11 +136,12 @@ class CustomExportContent(ExportContent):
                         stripped = tile_ref.lstrip("@")
                         tile_type, tile_id = stripped.split("/", 1)
                         tile_id = tile_id.split("?")[0]
-                    except (ValueError, AttributeError):
+                    except (ValueError, AttributeError) as exception:
+                        logger.error("Error parsing tile reference '%s': %s", tile_ref, exception)
+                    
+                    if tile_type in TILES_TO_REMOVE:
                         continue
 
-                    if tile_type == "unibo.tiles.rss_eventi":
-                        continue
                     annotation_key = "{}.{}".format(ANNOTATIONS_KEY_PREFIX, tile_id)
                     annotation = annotations.get(annotation_key)
                     if annotation is None:
