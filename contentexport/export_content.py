@@ -32,8 +32,6 @@ SUPPORTED_LANGUAGES = ("it", "en")
 
 TILES_KEY = "exportimport.tiles_data"
 
-TILES_TO_REMOVE = ["unibo.tiles.rss_eventi", "unibo.tiles.bandi"]
-
 
 class CustomExportContent(ExportContent):
 
@@ -41,12 +39,27 @@ class CustomExportContent(ExportContent):
     }
 
     DROP_PATHS = [
+        "/dipartimenti/resources"
     ]
 
     DROP_UIDS = [
     ]
 
-    SITE_ROOT = "http://cms01:4081/dipartimenti"
+    DROP_TILES = [
+        "unibo.tiles.rss_eventi",
+        "unibo.tiles.banners",
+        "unibo.tiles.eventiricerca",
+        "unibo.tiles.multi.galleria",
+        "unibo.tiles.multi.hp_head",
+        "unibo.tiles.multi.avvisi",
+        "unibo.tiles.notizie",
+    ]
+
+
+    REPLACE_TILES = {
+        "unibo.tiles.multi.avvisi": "unibo.tiles.ultimora",
+        "unibo.tiles.notiziehp": "unibo.tiles.notizie",
+    }
 
     def update_query(self, query):
         return query
@@ -63,30 +76,12 @@ class CustomExportContent(ExportContent):
         Bad: Changing the content-item is a bad idea.
         Good: Return None if you want to skip this particular object.
         """
-        RESOURCES = f"{self.SITE_ROOT}/resources"
-        if obj.absolute_url() == RESOURCES:
-            return None
         return obj
 
     def global_dict_hook(self, item, obj):
         """Used this to modify the serialized data.
         Return None if you want to skip this particular object.
         """
-        RESOURCES = f"{self.SITE_ROOT}/resources"
-
-        if item.get("@id").startswith(RESOURCES):
-            for lang in SUPPORTED_LANGUAGES:
-                if item.get("@id").startswith(f"{RESOURCES}/{lang}"):
-                    item["language"] = lang
-                    if item.get("@id") == f"{RESOURCES}/{lang}":
-                        item["@type"] = "LanguageFolder"
-                        item["parent"]["@id"] = self.SITE_ROOT
-                        item["parent"]["@type"] = "Plone Site"
-                        item["parent"]["UID"] = None
-                    else:
-                        if item.get("@id") == f"{RESOURCES}/{lang}/banners":
-                            item["parent"]["@type"] = "LanguageFolder"
-                    item["parent"]["@id"] = item["parent"]["@id"].replace(f"{RESOURCES}/{lang}", f"{self.SITE_ROOT}/{lang}")
 
         modifier_id = last_modifier(obj)
         if modifier_id:
@@ -129,6 +124,7 @@ class CustomExportContent(ExportContent):
             for fieldname, field in getFieldsInOrder(schema):
                 if not isinstance(field, TilesField):
                     continue
+                new_tile_refs =[]
                 tile_refs = getattr(obj, fieldname, None) or []
                 for tile_ref in tile_refs:
                     # tile_ref format: @@{tile_type}/{tile_id}
@@ -138,10 +134,19 @@ class CustomExportContent(ExportContent):
                         tile_id = tile_id.split("?")[0]
                     except (ValueError, AttributeError) as exception:
                         logger.error("Error parsing tile reference '%s': %s", tile_ref, exception)
-                    
-                    if tile_type in TILES_TO_REMOVE:
                         continue
 
+                    if tile_type in self.DROP_TILES:
+                        continue
+
+                    if tile_type in self.REPLACE_TILES:
+                        new_tile_type = self.REPLACE_TILES[tile_type]
+                        new_tile_ref = "@@{}/{}".format(new_tile_type, tile_id)
+                        new_tile_refs.append(new_tile_ref)
+                        tiles_data[tile_id] = {"__tile_type__": new_tile_type}
+                        continue
+
+                    new_tile_refs.append(tile_ref)
                     annotation_key = "{}.{}".format(ANNOTATIONS_KEY_PREFIX, tile_id)
                     annotation = annotations.get(annotation_key)
                     if annotation is None:
@@ -162,6 +167,7 @@ class CustomExportContent(ExportContent):
                             "Could not export tile %s (%s) on %s",
                             tile_id, tile_type, obj.absolute_url(),
                         )
+                item[fieldname] = new_tile_refs
 
         if tiles_data:
             item[TILES_KEY] = tiles_data

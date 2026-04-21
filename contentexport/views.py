@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 TYPES_TO_EXPORT = [
     "Folder",
     "Document",
-    "Event",
+    # "Event",
     "File",
     "Image",
     "Link",
@@ -22,11 +22,10 @@ TYPES_TO_EXPORT = [
     "Collection",
     # Custom dipartimenti types
     "HomePage",
-    "Banner",
     "Channel",
     "Newsletter",
     "CorsiStudio",
-    "Events",
+    # "Events",
     "AgendaEventi",
     "AgendaEvento",
     "AltaFormazione",
@@ -47,7 +46,7 @@ TYPES_TO_EXPORT = [
     "ScuoleSpecializzazione",
     "SiteContainer",
     "SommarioAmbiti",
-    "StrilloEvento",
+    # "StrilloEvento",
     "StrilloNotizia",
     "Visiting",
 ]
