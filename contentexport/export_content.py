@@ -55,10 +55,22 @@ class CustomExportContent(ExportContent):
         "unibo.tiles.notizie",
     ]
 
-
     REPLACE_TILES = {
-        "unibo.tiles.multi.avvisi": "unibo.tiles.ultimora",
+        "unibo.tiles.lancio_ambiti": "unibo.tiles.lancio_ricerca",
         "unibo.tiles.notiziehp": "unibo.tiles.notizie",
+        "unibo.tiles.eventihp": "unibo.tiles.eventi",
+        "unibo.tiles.multi.avvisi": "unibo.tiles.ultimora",
+        "unibo.tiles.multi.links_attachments": "unibo.tiles.links_attachments",
+        "unibo.tiles.multi.summary_link": "unibo.tiles.summary_link",
+        "unibo.tiles.multi.links": "unibo.tiles.links",
+        "unibo.tiles.multi.map_multipoint": "unibo.tiles.map_multipoint",
+        "unibo.tiles.multi.album": "unibo.tiles.album",
+        "unibo.tiles.multi.contacts": "unibo.tiles.contacts",
+        "unibo.tiles.multi.infografica": "unibo.tiles.infografica",
+        "unibo.tiles.multi.lanci": "unibo.tiles.lanci",
+        "unibo.tiles.multi.focus": "unibo.tiles.focus",
+        "unibo.tiles.multi.media_gallery_video": "unibo.tiles.media_gallery_video",
+        "unibo.tiles.multi.linkedimageattachment": "unibo.tiles.linkedimageattachment",
     }
 
     def update_query(self, query):
