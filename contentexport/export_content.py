@@ -99,6 +99,14 @@ class CustomExportContent(ExportContent):
         if modifier_id:
             item["last_modifier"] = modifier_id
 
+        if item["@type"] == "AgendaEventi":
+            if item["id"] == "agenda-events":
+                item["id"] = "events"
+                item["title"]  = "Events"
+            elif item["id"] == "agenda-eventi":
+                item["id"] = "eventi"
+                item["title"]  = "Eventi"
+
         item_url = item.get("@id", "")
         path = urlparse(item_url).path if isinstance(item_url, str) else ""
         segments = [seg.lower() for seg in path.split("/") if seg]
