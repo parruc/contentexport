@@ -46,13 +46,24 @@ class CustomExportContent(ExportContent):
     ]
 
     DROP_TILES = [
+        "eod.tiles.slides",
+        "eod.tiles.links_attachments",
+        "eod.tiles.richtext",
+        "eod.tiles.video",
+        "eod.tiles.map",
+        "eod.tiles.album",
+        "unibo.tiles.contatti",
+        "unibo.tiles.summary_link",
         "unibo.tiles.rss_eventi",
         "unibo.tiles.banners",
         "unibo.tiles.eventiricerca",
+        "unibo.tiles.multi.banners",
         "unibo.tiles.multi.galleria",
         "unibo.tiles.multi.hp_head",
         "unibo.tiles.multi.avvisi",
         "unibo.tiles.notizie",
+        "unibo.tiles.tessera",
+        "unibo.tiles.dipartimenti.tessera",
     ]
 
     REPLACE_TILES = {
@@ -160,16 +171,14 @@ class CustomExportContent(ExportContent):
                         continue
 
                     if tile_type in self.REPLACE_TILES:
-                        new_tile_type = self.REPLACE_TILES[tile_type]
-                        new_tile_ref = "@@{}/{}".format(new_tile_type, tile_id)
-                        new_tile_refs.append(new_tile_ref)
-                        tiles_data[tile_id] = {"__tile_type__": new_tile_type}
-                        continue
+                        tile_type = self.REPLACE_TILES[tile_type]
 
-                    new_tile_refs.append(tile_ref)
+                    new_tile_refs.append("@@{}/{}".format(tile_type, tile_id))
+
                     annotation_key = "{}.{}".format(ANNOTATIONS_KEY_PREFIX, tile_id)
                     annotation = annotations.get(annotation_key)
                     if annotation is None:
+                        tiles_data[tile_id] = {"__tile_type__": tile_type}
                         continue
 
                     try:

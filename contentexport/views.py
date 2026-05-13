@@ -78,7 +78,8 @@ class ExportAll(BrowserView):
 
         other_exports = [
             "export_relations",
-            "export_members",
+            # "export_members" skipped: with LDAP, acl.searchUsers() dumps
+            # the entire directory. Groups/principals are in export_groups.
             "export_translations",
             "export_localroles",
             "export_ordering",
