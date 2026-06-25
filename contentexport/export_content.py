@@ -54,11 +54,11 @@ class CustomExportContent(ExportContent):
     ]
 
     RENAME_PATHS_RE = {
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/didattica($|/.*)": {"title": "Studiare", "id": "studiare"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/teaching($|/.*)": {"title": "Study", "id": "study"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/notizie($|/.*)": {"title": "News", "id": "news"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/agenda-events($|/.*)": {"title": "Events", "id": "events"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/agenda-eventi($|/.*)": {"title": "Eventi", "id": "eventi"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/didattica/?$": {"title": "Studiare", "id": "studiare"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/teaching/?$": {"title": "Study", "id": "study"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/notizie/?$": {"title": "News", "id": "news"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/agenda-events/?$": {"title": "Events", "id": "events"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/agenda-eventi/?$": {"title": "Eventi", "id": "eventi"},
     }
 
     DROP_TILES = [
@@ -111,10 +111,11 @@ class CustomExportContent(ExportContent):
 
 
     def global_obj_hook(self, obj):
-        """Used this to inspect the content item before serialisation data.
-        Bad: Changing the content-item is a bad idea.
-        Good: Return None if you want to skip this particular object.
-        """
+        url = obj.absolute_url()
+        for drop_path_re in self.DROP_PATHS_RE:
+            if re.match(drop_path_re, url):
+                logger.info("Dropping item with URL: %s", url)
+                return None
         return obj
 
     def global_dict_hook(self, item, obj):
@@ -122,11 +123,6 @@ class CustomExportContent(ExportContent):
         Return None if you want to skip this particular object.
         """
 
-        for drop_path_re in self.DROP_PATHS_RE:
-            if re.match(drop_path_re, item.get("@id", "")):
-                logger.info("Dropping item with URL: %s", item.get("@id", ""))
-                return None
-        
         for rename_path_re, replacement in self.RENAME_PATHS_RE.items():
             if re.match(rename_path_re, item.get("@id", "")):
                 logger.info("Renaming item with URL: %s to %s", item.get("@id", ""), replacement)
