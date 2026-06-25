@@ -54,11 +54,11 @@ class CustomExportContent(ExportContent):
     ]
 
     RENAME_PATHS_RE = {
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/didattica/?$": {"title": "Studiare", "id": "studiare"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/teaching/?$": {"title": "Study", "id": "study"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/notizie/?$": {"title": "News", "id": "news"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/agenda-events/?$": {"title": "Events", "id": "events"},
-        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/agenda-eventi/?$": {"title": "Eventi", "id": "eventi"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/(didattica)/?$": {"title": "Studiare", "id": "studiare"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/(teaching)/?$": {"title": "Study", "id": "study"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/(notizie)/?$": {"title": "News", "id": "news"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/(agenda-events)/?$": {"title": "Events", "id": "events"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/(agenda-eventi)/?$": {"title": "Eventi", "id": "eventi"},
     }
 
     DROP_TILES = [
@@ -124,8 +124,13 @@ class CustomExportContent(ExportContent):
         """
 
         for rename_path_re, replacement in self.RENAME_PATHS_RE.items():
-            if re.match(rename_path_re, item.get("@id", "")):
-                logger.info("Renaming item with URL: %s to %s", item.get("@id", ""), replacement)
+            item_id = item.get("@id", "")
+            match = re.match(rename_path_re, item_id)
+            if match:
+                logger.info("Renaming item with URL: %s to %s", item_id, replacement)
+                replacement_id = replacement["id"]
+                start, end = match.span(1)
+                replacement["@id"] = f"{item_id[:start]}{replacement_id}{item_id[end:]}"
                 item.update(replacement)
                 break
 
