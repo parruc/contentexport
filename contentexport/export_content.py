@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import re
 import base64
 import logging
 from collections.abc import Mapping
@@ -35,81 +36,30 @@ TILES_KEY = "exportimport.tiles_data"
 
 class CustomExportContent(ExportContent):
 
+    EXPORT_DOMAIN = "http://cms01:4081"
+
     QUERY = {
     }
 
     DROP_PATHS = [
         "/dipartimenti/resources",
-        "/dipartimenti/bigea/it/biblioteca",
-        "/dipartimenti/bigea/en/library",
-        "/dipartimenti/chim/it/biblioteca",
-        "/dipartimenti/chim/en/library",
-        "/dipartimenti/chimind/it/biblioteca",
-        "/dipartimenti/chimind/en/library",
-        "/dipartimenti/da/it/biblioteca",
-        "/dipartimenti/da/en/library",
-        "/dipartimenti/dar/it/biblioteca",
-        "/dipartimenti/dar/en/library",
-        "/dipartimenti/dbc/it/biblioteca",
-        "/dipartimenti/dbc/en/library",
-        "/dipartimenti/dei/it/biblioteca",
-        "/dipartimenti/dei/en/library",
-        "/dipartimenti/dibinem/it/biblioteca",
-        "/dipartimenti/dibinem/en/library",
-        "/dipartimenti/dicam/it/biblioteca",
-        "/dipartimenti/dicam/en/library",
-        "/dipartimenti/difa/it/biblioteca",
-        "/dipartimenti/difa/en/library",
-        "/dipartimenti/dimes/it/biblioteca",
-        "/dipartimenti/dimes/en/library",
-        "/dipartimenti/dimec/it/biblioteca",
-        "/dipartimenti/dimec/en/library",
-        "/dipartimenti/dimevet/it/biblioteca",
-        "/dipartimenti/dimevet/en/library",
-        "/dipartimenti/din/it/biblioteca",
-        "/dipartimenti/din/en/library",
-        "/dipartimenti/dipsa/it/biblioteca",
-        "/dipartimenti/dipsa/en/library",
-        "/dipartimenti/disat/it/biblioteca",
-        "/dipartimenti/disat/en/library",
-        "/dipartimenti/disci/it/biblioteca",
-        "/dipartimenti/disci/en/library",
-        "/dipartimenti/disi/it/biblioteca",
-        "/dipartimenti/disi/en/library",
-        "/dipartimenti/distal/it/biblioteca",
-        "/dipartimenti/distal/en/library",
-        "/dipartimenti/dit/it/biblioteca",
-        "/dipartimenti/dit/en/library",
-        "/dipartimenti/dse/it/biblioteca",
-        "/dipartimenti/dse/en/library",
-        "/dipartimenti/dsg/it/biblioteca",
-        "/dipartimenti/dsg/en/library",
-        "/dipartimenti/edu/it/biblioteca",
-        "/dipartimenti/edu/en/library",
-        "/dipartimenti/fabit/it/biblioteca",
-        "/dipartimenti/fabit/en/library",
-        "/dipartimenti/ficlit/it/biblioteca",
-        "/dipartimenti/ficlit/en/library",
-        "/dipartimenti/filcom/it/biblioteca",
-        "/dipartimenti/filcom/en/library",
-        "/dipartimenti/lilec/it/biblioteca",
-        "/dipartimenti/lilec/en/library",
-        "/dipartimenti/mat/it/biblioteca",
-        "/dipartimenti/mat/en/library",
-        "/dipartimenti/psi/it/biblioteca",
-        "/dipartimenti/psi/en/library",
-        "/dipartimenti/quvi/it/biblioteca",
-        "/dipartimenti/quvi/en/library",
-        "/dipartimenti/sde/it/biblioteca",
-        "/dipartimenti/sde/en/library",
-        "/dipartimenti/sps/it/biblioteca",
-        "/dipartimenti/sps/en/library",
-        "/dipartimenti/stat/it/biblioteca",
-        "/dipartimenti/stat/en/library",
+    ]
+
+    DROP_PATHS_RE = [
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/biblioteca($|/.*)",
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/library($|/.*)",
     ]
 
     DROP_UIDS = [
     ]
+
+    RENAME_PATHS = {
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/didattica($|/.*)": {"title": "Studiare", "id": "studiare"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/teaching($|/.*)": {"title": "Study", "id": "study"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/notizie($|/.*)": {"title": "News", "id": "news"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/agenda-events($|/.*)": {"title": "Events", "id": "events"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/agenda-eventi($|/.*)": {"title": "Eventi", "id": "eventi"},
+    }
 
     DROP_TILES = [
         "eod.tiles.slides",
@@ -172,17 +122,18 @@ class CustomExportContent(ExportContent):
         Return None if you want to skip this particular object.
         """
 
+        for drop_path_re in self.DROP_PATHS_RE:
+            if re.match(drop_path_re, item.get("@id", "")):
+                return None
+        
+        for rename_path_re, replacement in self.RENAME_PATHS_RE.items():
+            if re.match(rename_path_re, item.get("@id", "")):
+                item.update(replacement)
+                break
+
         modifier_id = last_modifier(obj)
         if modifier_id:
             item["last_modifier"] = modifier_id
-
-        if item["@type"] == "AgendaEventi":
-            if item["id"] == "agenda-events":
-                item["id"] = "events"
-                item["title"]  = "Events"
-            elif item["id"] == "agenda-eventi":
-                item["id"] = "eventi"
-                item["title"]  = "Eventi"
 
         item_url = item.get("@id", "")
         path = urlparse(item_url).path if isinstance(item_url, str) else ""
