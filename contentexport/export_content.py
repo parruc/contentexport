@@ -53,7 +53,7 @@ class CustomExportContent(ExportContent):
     DROP_UIDS = [
     ]
 
-    RENAME_PATHS = {
+    RENAME_PATHS_RE = {
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/didattica($|/.*)": {"title": "Studiare", "id": "studiare"},
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/teaching($|/.*)": {"title": "Study", "id": "study"},
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/notizie($|/.*)": {"title": "News", "id": "news"},
@@ -124,10 +124,12 @@ class CustomExportContent(ExportContent):
 
         for drop_path_re in self.DROP_PATHS_RE:
             if re.match(drop_path_re, item.get("@id", "")):
+                logger.info("Dropping item with URL: %s", item.get("@id", ""))
                 return None
         
         for rename_path_re, replacement in self.RENAME_PATHS_RE.items():
             if re.match(rename_path_re, item.get("@id", "")):
+                logger.info("Renaming item with URL: %s to %s", item.get("@id", ""), replacement)
                 item.update(replacement)
                 break
 
