@@ -48,6 +48,7 @@ class CustomExportContent(ExportContent):
     DROP_PATHS_RE = [
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/biblioteca($|/.*)",
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/library($|/.*)",
+        rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/.*?/form($|/.*)",
     ]
 
     DROP_UIDS = [
@@ -86,6 +87,7 @@ class CustomExportContent(ExportContent):
         "unibo.tiles.lancio_ambiti": "unibo.tiles.lancio_ricerca",
         "unibo.tiles.notiziehp": "unibo.tiles.notizie",
         "unibo.tiles.eventihp": "unibo.tiles.eventi",
+        "unibo.tiles.box_link": "unibo.tiles.ambito",
         "unibo.tiles.multi.avvisi": "unibo.tiles.ultimora",
         "unibo.tiles.multi.links_attachments": "unibo.tiles.links_attachments",
         "unibo.tiles.multi.summary_link": "unibo.tiles.summary_link",
@@ -171,6 +173,7 @@ class CustomExportContent(ExportContent):
 
         tiles_data = {}
 
+        if 
         for schema in iterSchemata(obj):
             for fieldname, field in getFieldsInOrder(schema):
                 if not isinstance(field, TilesField):
