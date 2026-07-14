@@ -18,6 +18,7 @@ from plone.dexterity.utils import iterSchemata
 from zope.interface import directlyProvidedBy
 from zope.schema import getFieldsInOrder
 from plone.formwidget.geolocation.geolocation import Geolocation
+from unibo.tiles.config import HIDDEN_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,19 @@ class CustomExportContent(ExportContent):
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/(notizie)/?$": {"title": "News", "id": "news"},
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/en/(agenda-events)/?$": {"title": "Events", "id": "events"},
         rf"^{EXPORT_DOMAIN}/dipartimenti/.*?/it/(agenda-eventi)/?$": {"title": "Eventi", "id": "eventi"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(dbc)/?$": {"id": "beniculturali"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(chim)/?$": {"id": "chimica"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(chimind)/?$": {"id": "chimica-industriale"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(filcom)/?$": {"id": "filo"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(difa)/?$": {"id": "fisica-astronomia"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(din)/?$": {"id": "ingegneriaindustriale"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(lilec)/?$": {"id": "lingue"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(mat)/?$": {"id": "matematica"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(psi)/?$": {"id": "psicologia"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(disa)/?$": {"id": "scienzeaziendali"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(dimevet)/?$": {"id": "scienzemedicheveterinarie"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(quvi)/?$": {"id": "scienzequalitavita"},
+        rf"^{EXPORT_DOMAIN}/dipartimenti/(sps)/?$": {"id": "dsps"},
     }
 
     DROP_TILES = [
@@ -70,6 +84,7 @@ class CustomExportContent(ExportContent):
         "eod.tiles.map",
         "eod.tiles.album",
         "unibo.tiles.contatti",
+        "unibo.tiles.contacts",
         "unibo.tiles.summary_link",
         "unibo.tiles.rss_eventi",
         "unibo.tiles.banners",
@@ -173,7 +188,6 @@ class CustomExportContent(ExportContent):
 
         tiles_data = {}
 
-        if 
         for schema in iterSchemata(obj):
             for fieldname, field in getFieldsInOrder(schema):
                 if not isinstance(field, TilesField):
@@ -181,11 +195,14 @@ class CustomExportContent(ExportContent):
                 new_tile_refs =[]
                 tile_refs = getattr(obj, fieldname, None) or []
                 for tile_ref in tile_refs:
-                    # tile_ref format: @@{tile_type}/{tile_id}
+                    # tile_ref format: @@{tile_type}/{tile_id}?tile_hidden=True
                     try:
                         stripped = tile_ref.lstrip("@")
                         tile_type, tile_id = stripped.split("/", 1)
-                        tile_id = tile_id.split("?")[0]
+                        tile_id, _, tile_args = tile_id.partition("?")
+                        if tile_args:
+                            tile_args = "?" + tile_args
+
                     except (ValueError, AttributeError) as exception:
                         logger.error("Error parsing tile reference '%s': %s", tile_ref, exception)
                         continue
@@ -196,7 +213,7 @@ class CustomExportContent(ExportContent):
                     if tile_type in self.REPLACE_TILES:
                         tile_type = self.REPLACE_TILES[tile_type]
 
-                    new_tile_refs.append("@@{}/{}".format(tile_type, tile_id))
+                    new_tile_refs.append("@@{}/{}{}".format(tile_type, tile_id, tile_args))
 
                     annotation_key = "{}.{}".format(ANNOTATIONS_KEY_PREFIX, tile_id)
                     annotation = annotations.get(annotation_key)
