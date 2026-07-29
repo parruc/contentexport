@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='contentexport',
-    version='0.5.dev0',
+    version='0.5',
     description='Example for extending collective.exportimport',
     url='https://github.com/starzel/contentexport',
     author='Philip Bauer',
