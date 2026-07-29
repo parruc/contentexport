@@ -29,6 +29,16 @@
       permission="cmf.ManagePortal"
       />
 
+  <!-- shadows collective.exportimport's @@export_members on our layer -->
+  <browser:page
+      name="export_members"
+      for="zope.interface.Interface"
+      class=".views.ExportLocalMembers"
+      template="templates/export_other.pt"
+      layer="contentexport.interfaces.IContentexportLayer"
+      permission="cmf.ManagePortal"
+      />
+
   <browser:page
       name="export_all"
       for="zope.interface.Interface"

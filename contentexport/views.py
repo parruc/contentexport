@@ -5,6 +5,7 @@ from plone import api
 from plone.restapi.serializer.converters import json_compatible
 from Products.CMFPlone.utils import get_installer
 from Products.Five import BrowserView
+from uuid import uuid4
 from zope.interface import alsoProvides
 
 import logging
@@ -80,10 +81,10 @@ class ExportAll(BrowserView):
 
         other_exports = [
             "export_relations",
-            # "export_members" skipped: with LDAP, acl.searchUsers() dumps
-            # the entire directory. @@export_groups below exports only the
-            # local groups (incl. their LDAP members as plain principal ids).
+            # both of these are local-only variants: the stock @@export_members
+            # enumerates acl.searchUsers(), which dumps the whole AD directory
             "export_groups",
+            "export_members",
             "export_translations",
             "export_localroles",
             "export_ordering",
@@ -155,3 +156,81 @@ class ExportGroups(ExportMembers):
             item["principals"] = group.getGroup().getMemberIds()
             data.append(item)
         return data
+
+
+class ExportLocalMembers(ExportMembers):
+    """Materialise the principals the local groups reference.
+
+    Registered as @@export_members on the contentexport layer, so it shadows
+    the stock view (which enumerates acl.searchUsers() and would walk all of
+    AD) while still writing the export_members.json the importer looks for.
+
+    The editors only ever existed as member ids inside the local groups,
+    resolved through LDAP; nothing about them is in source_users. The new site
+    has no LDAP, so @@oauth2-login cannot find them unless they are migrated as
+    real Plone users. Their id is the userPrincipalName, i.e. the email, so no
+    directory lookup is needed to build the member records.
+    """
+
+    def __init__(self, context, request):
+        super(ExportLocalMembers, self).__init__(context, request)
+        self.title = u"Export local members"
+
+    def __call__(self, download_to_server=False):
+        self.download_to_server = download_to_server
+        if not self.request.form.get("form.submitted", False):
+            return self.index()
+
+        logger.info(u"Exporting local members...")
+        # groups come from @@export_groups, which is imported before the content
+        data = {"groups": [], "members": self.export_members()}
+        logger.info(u"Exported {} local members".format(len(data["members"])))
+        self.download(data)
+
+    def export_members(self):
+        acl = api.portal.get_tool("acl_users")
+        local_group_ids = {i["id"] for i in acl.source_groups.enumerateGroups()}
+
+        groups_by_member = {}
+        for groupid in local_group_ids:
+            if groupid in self.AUTO_GROUPS:
+                continue
+            for principal in acl.source_groups.getGroupMembers(groupid):
+                groups_by_member.setdefault(principal, []).append(groupid)
+
+        data = []
+        for principal, groups in sorted(groups_by_member.items()):
+            if principal in local_group_ids:
+                # nested group, not a person
+                continue
+            data.append(
+                {
+                    "username": principal,
+                    # the principal id is the userPrincipalName; @@import_members
+                    # silently skips members without an email
+                    "email": principal,
+                    # nobody authenticates with a password, entraid does that,
+                    # but addMember runs testPasswordValidity on it
+                    "password": uuid4().hex,
+                    # roles come with the groups
+                    "roles": [],
+                    "groups": sorted(groups),
+                    "fullname": self._fullname(principal),
+                    "listed": True,
+                }
+            )
+        return data
+
+    def _fullname(self, principal):
+        """Best effort: the only per-principal LDAP lookup in this export."""
+        try:
+            member = self.pms.getMemberById(principal)
+        except Exception:
+            logger.exception("Could not look up %s", principal)
+            return u""
+        if member is None:
+            return u""
+        fullname = member.getProperty("fullname", "") or u""
+        if isinstance(fullname, bytes):
+            fullname = fullname.decode("utf-8", "replace")
+        return fullname
